@@ -1,0 +1,30 @@
+# =============================================================================
+# docker-compose.yml – Ecosistema CI/CD para hello-demo
+# =============================================================================
+
+services:
+  jenkins-local:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jenkins-local
+    restart: unless-stopped
+    ports:
+      - "8080:8080" # Interfaz web de Jenkins
+      - "50000:50000" # Comunicación con agentes JNLP
+    volumes:
+      - jenkins_home:/var/jenkins_home # Persistencia de Jobs, config y plugins
+      - /var/run/docker.sock:/var/run/docker.sock # Acceso al Docker del host (builds futuros)
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false # Desactiva el wizard de configuración inicial
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/login" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+# ── Volumen nombrado para persistencia total ─────────────────────────────────
+volumes:
+  jenkins_home:
+    driver: local
