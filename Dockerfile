@@ -14,8 +14,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        openjdk-17-jdk \
-        maven && \
+    wget \
+    apt-transport-https \
+    gnupg && \
+    # Repositorio oficial de Eclipse Temurin (Adoptium) — compatible con Debian Trixie
+    wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /usr/share/keyrings/adoptium.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(. /etc/os-release && echo $VERSION_CODENAME) main" \
+    > /etc/apt/sources.list.d/adoptium.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    temurin-17-jdk \
+    maven && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -27,9 +36,9 @@ ENV PATH="${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"
 # ── Plugin de Pipelines (workflow-aggregator) ────────────────────────────────
 # Instala el plugin en tiempo de build para que esté disponible desde el inicio
 RUN jenkins-plugin-cli --plugins \
-        workflow-aggregator:latest \
-        git:latest \
-        maven-plugin:latest
+    workflow-aggregator:latest \
+    git:latest \
+    maven-plugin:latest
 
 # ── Volvemos al usuario jenkins por seguridad ────────────────────────────────
 USER jenkins
