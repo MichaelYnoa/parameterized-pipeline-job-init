@@ -24,6 +24,8 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
     temurin-17-jdk \
+    jq \
+    cowsay \
     maven && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -31,7 +33,7 @@ RUN apt-get update && \
 # ── Variables de entorno para Java y Maven ───────────────────────────────────
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV MAVEN_HOME=/usr/share/maven
-ENV PATH="${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"
+ENV PATH="${JAVA_HOME}/bin:${MAVEN_HOME}/bin:/usr/games:/usr/local/games:${PATH}"
 
 # ── Plugin de Pipelines (workflow-aggregator) ────────────────────────────────
 # Instala el plugin en tiempo de build para que esté disponible desde el inicio
